@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { fetchDataFromApi } from "./utils/api";
 import { useSelector, useDispatch } from "react-redux";
-import { getGenres } from "./store/homeSlice";
+import { getApiConfiguration } from "./store/homeSlice";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Home from "./pages/home/Home";
@@ -15,24 +15,30 @@ import Footer from "./components/footer/Footer";
 function App() {
   const dispatch = useDispatch();
 
-  const { genres } = useSelector((state) => state.home);
+  const { url } = useSelector((state) => state.home);
 
-  console.log(genres);
+  console.log(url);
 
   useEffect(() => {
-    apiTesting();
+    fetchApiConfig();
   }, []);
 
-  const apiTesting = () => {
-    fetchDataFromApi("/movie/popular").then((res) => {
-      // console.log(res);
-      dispatch(getGenres(res));
+  const fetchApiConfig = () => {
+    fetchDataFromApi("/configuration").then((res) => {
+      console.log(res);
+
+      const url = {
+        backdrop: res.images.secure_base_url + "original",
+        poster: res.images.secure_base_url + "original",
+        porfile: res.images.secure_base_url + "original",
+      };
+      dispatch(getApiConfiguration(url));
     });
   };
 
   return (
     <BrowserRouter>
-      {/* <Header /> */}
+      <Header />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/:mediaType/:id" element={<Details />} />
